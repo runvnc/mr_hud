@@ -1,0 +1,7 @@
+{
+  "name": "HUD (Session Data)",
+  "version": "1.0.0",
+  "description": "Adds a 'HUD' area showing session data above the chat",
+  "services": [],
+  "commands": []
+}

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: transparent !important;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    .hud-slide-enter {
+      transform: translateX(0);
+      transition: transform 0.3s ease-out;
+    }
+    .hud-slide-exit {
+      transform: translateX(calc(100% - 32px));
+      transition: transform 0.3s ease-out;
+    }
+  </style>
+  <script>
+    // Timer management
+    class TimerManager {
+      constructor() {
+        this.timers = new Map();
+        this.intervalId = null;
+      }
+
+      updateTimers(timerData) {
+        this.timers.clear();
+        Object.entries(timerData).forEach(([name, endTime]) => {
+          this.timers.set(name, new Date(endTime).getTime());
+        });
+        
+        if (!this.intervalId && this.timers.size > 0) {
+          this.startUpdates();
+        }
+      }
+
+      startUpdates() {
+        this.intervalId = setInterval(() => this.updateDisplay(), 1000);
+      }
+
+      formatTimeRemaining(endTime) {
+        const now = Date.now();
+        const remaining = endTime - now;
+
+        if (remaining <= 0) return 'Completed';
+
+        const hours = Math.floor(remaining / (1000 * 60 * 60));
+        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      }
+
+      updateDisplay() {
+        const timerElements = document.querySelectorAll('[data-timer-name]');
+        timerElements.forEach(element => {
+          const name = element.dataset.timerName;
+          const endTime = this.timers.get(name);
+          if (endTime) {
+            element.textContent = this.formatTimeRemaining(endTime);
+          }
+        });
+      }
+
+      stop() {
+        if (this.intervalId) {
+          clearInterval(this.intervalId);
+          this.intervalId = null;
+        }
+      }
+    }
+
+    const timerManager = new TimerManager();
+
+    function render(data) {
+      // Update timers
+      if (data.timers) {
+        timerManager.updateTimers(data.timers);
+      }
+
+      return `
+        <div id="hudContainer" class="fixed top-4 right-4 bg-gray-900/80 text-white rounded-lg shadow-lg p-4 font-mono text-sm backdrop-blur-sm border border-gray-700 min-w-[250px] pointer-events-auto hud-slide-enter">
+          <!-- Toggle Button -->
+          <button 
+            onclick="toggleHUD()" 
+            class="absolute -left-7 top-2 bg-gray-900/80 text-gray-400 hover:text-white p-1 rounded-l-md border border-r-0 border-gray-700"
+            style="width: 28px;"
+          >
+            <svg id="toggleIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          <div id="hudContent">
+            ${data.timers && Object.keys(data.timers).length > 0 ? `
+              <!-- Countdown Timers Section -->
+              <div class="mb-3">
+                <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">Countdowns</div>
+                <div class="space-y-1">
+                  ${Object.entries(data.timers).map(([name, endTime]) => `
+                    <div class="flex justify-between items-center">
+                      <span class="text-gray-300">${name}:</span>
+                      <span class="text-emerald-400" data-timer-name="${name}">
+                        ${timerManager.formatTimeRemaining(new Date(endTime).getTime())}
+                      </span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Session Data Section -->
+            <div>
+              <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">Session Data</div>
+              <div class="space-y-1">
+                ${Object.entries(data.session || {}).map(([key, value]) => `
+                  <div class="flex justify-between items-center">
+                    <span class="text-gray-300">${key}:</span>
+                    <span class="text-blue-400">${value}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleHUD() {
+      const container = document.getElementById('hudContainer');
+      const content = document.getElementById('hudContent');
+      const icon = document.getElementById('toggleIcon');
+      
+      if (container.classList.contains('hud-slide-enter')) {
+        container.classList.remove('hud-slide-enter');
+        container.classList.add('hud-slide-exit');
+        content.style.display = 'none';
+        icon.innerHTML = `
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        `;
+      } else {
+        container.classList.remove('hud-slide-exit');
+        container.classList.add('hud-slide-enter');
+        content.style.display = 'block';
+        icon.innerHTML = `
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        `;
+      }
+    }
+
+    // Example usage with countdown timers:
+    const testData = {
+      timers: {
+        'Task Deadline': new Date(Date.now() + 45 * 60 * 1000).toISOString(), // 45 minutes from now
+        'Break Time': new Date(Date.now() + 15 * 60 * 1000).toISOString(),   // 15 minutes from now
+        'Meeting': new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()  // 2 hours from now
+      },
+      session: {
+        'User': 'John Doe',
+        'Mode': 'Active',
+        'Memory Usage': '85%',
+        'Messages': '42',
+        'Tokens': '1,234'
+      }
+    };
+
+    // Auto-render on load
+    window.onload = () => document.body.innerHTML = render(testData);
+
+    // Clean up timers when the page is unloaded
+    window.onunload = () => timerManager.stop();
+  </script>
+</head>
+<body>
+</body>
+</html>
