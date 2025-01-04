@@ -1,1 +1,1 @@
-from .mod import register_commands
+from .mod import *
