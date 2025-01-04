@@ -2,7 +2,7 @@ from lib.chatcontext import ChatContext
 from fastapi import APIRouter, Request 
 from lib.providers.services import service_manager
 from lib.providers.commands import command_manager
-i
+
 router = APIRouter()
 
 @router.get("/session_data/{log_id}")
