@@ -14,10 +14,15 @@
     } */
   </style>
 {% endblock %}
+    
+    {% block content %}
+    <div class="main">
+        <details class="hud" open>
+          <summary>Session Data</summary>
+          <session-hud></session-hud>
+        </details>
 
-{% block insert %}
-  <details class="hud" open>
-    <summary>Session Data</summary>
-    <session-hud></session-hud>
-  </details>
-{% endblock %}
+        <chat-ai sessionid="{{ log_id }}" agent_name="{{ agent_name }}"></chat-ai>
+    </div>
+    {% endblock %}
+
