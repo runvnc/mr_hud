@@ -20,13 +20,17 @@ class SessionHUD extends LitElement {
       background: rgba(0, 0, 0, 0.2);
       margin-bottom: 0.5rem;
       border-collapse: collapse;
-      width: fit-content;
+      table-layout: fixed;
+      width: auto;
+      max-width: 100%;
     }
 
     td {
       border: 1px solid #444;
       vertical-align: top;
       padding: 4px 8px;
+      overflow: visible;
+      position: relative;
     }
 
     /* Key cells */
@@ -36,12 +40,13 @@ class SessionHUD extends LitElement {
       color: #9ecbff;
       white-space: nowrap;
       background: rgba(0, 0, 0, 0.2);
+      width: 1%;
     }
 
     /* Value cells */
     td:last-child {
       font-family: 'Fira Code', 'Consolas', monospace;
-      min-width: 150px;
+      width: auto;
     }
 
     .string-value {
@@ -71,20 +76,6 @@ class SessionHUD extends LitElement {
       margin: 0;
       width: 100%;
       background: transparent;
-      border: none;
-    }
-
-    table table td {
-      border-left: none;
-      border-right: none;
-    }
-
-    table table tr:first-child td {
-      border-top: none;
-    }
-
-    table table tr:last-child td {
-      border-bottom: none;
     }
 
     /* Hover effects */
@@ -133,7 +124,9 @@ class SessionHUD extends LitElement {
     if (typeof obj !== 'object') return String(obj);
     
     const table = document.createElement('table');
-    table.style.marginLeft = depth > 0 ? `${depth * 16}px` : '0';
+    if (depth > 0) {
+      table.style.marginLeft = `${depth * 16}px`;
+    }
     
     for (const [key, value] of Object.entries(obj)) {
       const row = table.insertRow();
