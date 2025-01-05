@@ -12,6 +12,9 @@ class SessionHUD extends LitElement {
       color: var(--workspace-text, var(--text-color, #e0e0e0));
       padding: 1rem;
       font-family: monospace;
+      overflow-y: scroll;
+      height: 35vh;
+      padding-top: 0;
     }
     
     table {
