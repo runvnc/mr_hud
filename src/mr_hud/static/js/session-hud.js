@@ -17,79 +17,38 @@ class SessionHUD extends LitElement {
     }
     
     table {
-      background: rgba(0, 0, 0, 0.2);
-      margin-bottom: 0.5rem;
       border-collapse: collapse;
-      table-layout: fixed;
-      width: auto;
-      max-width: 100%;
+      background: rgba(0, 0, 0, 0.2);
     }
 
     td {
+      padding: 4px 8px;
       border: 1px solid #444;
       vertical-align: top;
-      padding: 4px 8px;
-      overflow: visible;
-      position: relative;
     }
 
     /* Key cells */
     td:first-child {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-weight: 500;
       color: #9ecbff;
-      white-space: nowrap;
-      background: rgba(0, 0, 0, 0.2);
-      width: 1%;
+      font-family: sans-serif;
     }
 
     /* Value cells */
     td:last-child {
-      font-family: 'Fira Code', 'Consolas', monospace;
-      width: auto;
+      font-family: monospace;
     }
 
-    .string-value {
-      color: #a8ff60;
-    }
-
-    .number-value {
-      color: #ff7b72;
-    }
-
-    .date-value {
-      color: #d2a8ff;
-    }
-
-    .boolean-value {
-      color: #ff7b72;
-      font-weight: bold;
-    }
-
-    .null-value {
-      color: #676767;
-      font-style: italic;
-    }
-
-    /* Nested tables */
-    table table {
-      margin: 0;
-      width: 100%;
-      background: transparent;
-    }
-
-    /* Hover effects */
-    tr:hover > td {
-      background: rgba(255, 255, 255, 0.03);
-    }
+    .string-value { color: #a8ff60; }
+    .number-value { color: #ff7b72; }
+    .date-value { color: #d2a8ff; }
+    .boolean-value { color: #ff7b72; }
+    .null-value { color: #676767; }
   `;
 
   constructor() {
     super();
     this.data = null;
     this.fetchSessionData();
-    
-    // Set up periodic refresh
     setInterval(() => this.fetchSessionData(), 5000);
   }
 
@@ -107,7 +66,6 @@ class SessionHUD extends LitElement {
   formatValue(value) {
     if (value === null) return ['null', 'null-value'];
     if (typeof value === 'string') {
-      // Check if string is a date
       const dateTest = new Date(value);
       if (!isNaN(dateTest) && value.includes('-')) {
         return [value, 'date-value'];
@@ -124,9 +82,6 @@ class SessionHUD extends LitElement {
     if (typeof obj !== 'object') return String(obj);
     
     const table = document.createElement('table');
-    if (depth > 0) {
-      table.style.marginLeft = `${depth * 16}px`;
-    }
     
     for (const [key, value] of Object.entries(obj)) {
       const row = table.insertRow();
