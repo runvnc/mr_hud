@@ -19,8 +19,8 @@ class SessionHUD extends LitElement {
     table {
       background: rgba(0, 0, 0, 0.2);
       margin-bottom: 0.5rem;
-      border-collapse: separate;
-      border-spacing: 0;
+      border-collapse: collapse;
+      width: fit-content;
     }
 
     td {
@@ -71,6 +71,20 @@ class SessionHUD extends LitElement {
       margin: 0;
       width: 100%;
       background: transparent;
+      border: none;
+    }
+
+    table table td {
+      border-left: none;
+      border-right: none;
+    }
+
+    table table tr:first-child td {
+      border-top: none;
+    }
+
+    table table tr:last-child td {
+      border-bottom: none;
     }
 
     /* Hover effects */
@@ -119,7 +133,7 @@ class SessionHUD extends LitElement {
     if (typeof obj !== 'object') return String(obj);
     
     const table = document.createElement('table');
-    table.style.marginLeft = `${depth * 16}px`;
+    table.style.marginLeft = depth > 0 ? `${depth * 16}px` : '0';
     
     for (const [key, value] of Object.entries(obj)) {
       const row = table.insertRow();
